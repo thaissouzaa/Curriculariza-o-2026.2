@@ -1,0 +1,22 @@
+{
+  "name": "trilha-magica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jogo educativo infantil com Next.js e React, preparado para exportação estática.",
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thaissouzaa/Curriculariza-o-2026.2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}
