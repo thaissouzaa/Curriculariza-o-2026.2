@@ -39,9 +39,64 @@
       q("Descubra o padrão", "Observe os números e escolha o que está faltando.", "sequence", "Qual número completa a sequência?", { audio: "audio/dificil-05-sequencia-numerica.mp3", series: "2 → 4 → ? → 8", options: ["5", "6", "7", "9"], answer: "6" }),
       q("Onde está o tesouro?", "Ouça a dica e toque no lugar onde está o tesouro.", "treasure", "O tesouro está ao lado da árvore e embaixo da pedra.", { audio: "audio/dificil-06-tesouro.mp3", cells: [{ pos: "casa", icon: "🏠" }, { pos: "arvore", icon: "🌳" }, { pos: "pedra", icon: "🪨" }, { pos: "tesouro", icon: "⭐" }], answer: "pedra" }),
       q("Continue a sequência", "Observe o padrão e escolha a próxima figura.", "pattern", "Qual figura vem depois?", { audio: "audio/dificil-07-padrao-cores.mp3", series: "🔴 🔵 🔵 🔴 🔵 🔵 ?", options: ["🔵", "🔴", "🟢", "🟡"], answer: "🔴" }),
-      q("Observe e memorize", "Memorize as figuras. Elas vão sumir.", "memory", "Qual figura apareceu antes?", { audio: "audio/dificil-08-memoria-observar.mp3", responseAudio: "audio/dificil-08-memoria-responder.mp3", memory: "🍎　🐶　⭐　🚗", options: ["🐱", "🏠", "🍎", "⚽"], answer: "🍎" }),
+      q("Observe e memorize", "Memorize as figuras. Elas vão sumir.", "memory", "Qual figura apareceu antes?", { audio: "audio/dificil-08-memoria-observar.mp3", responseAudio: "audio/dificil-08-memoria-responder.mp3", memory: "🍎 🐶 ⭐ 🚗", options: ["🐱 Gato", "🏠 Casa", "🍎 Maçã", "⚽ Bola"], answer: "🍎 Maçã", displayTime: 3500 }),
       q("Ajude o personagem a chegar", "Escolha as setas na ordem certa.", "maze", "Leve o personagem até a casa seguindo o caminho marrom.", { audio: "audio/medio-08-caminho-casa.mp3", rows: 4, columns: 8, start: [3, 0], goal: [0, 7], route: ["➡️", "⬆️", "➡️", "⬆️", "➡️", "➡️", "⬇️", "➡️", "➡️", "⬆️", "➡️", "⬆️"], answer: "chegou" }),
       q("Letras e escrita", "Ouça a pergunta e escolha a forma correta de escrever o nome.", "choice", "João precisa escrever seu próprio nome. Qual forma está correta?", { audio: "audio/dificil-10-escrever-nome.mp3", options: ["joão", "joAO", "JOÃO", "João"], answer: "João" })
     ]
+  };
+
+  /**
+   * Renderizador para a questão do modo "memory" com contagem de tempo
+   * e exibição diferida das opções de resposta.
+   */
+  window.renderMemoryTask = function(q, containerEl) {
+    const timeToWait = q.displayTime || 3500; // Tempo em ms para memorizar antes de mostrar as opções
+
+    const html = `
+      <div class="activity-content memory-activity">
+        <p class="prompt memory-prompt">${q.prompt}</p>
+        <div class="visual memory-target" id="memoryDisplay">${q.memory}</div>
+        
+        <!-- Esta seção fica oculta até o tempo de memorização expirar -->
+        <div id="memorySelectionArea" class="memory-selection-area hidden-memory">
+          <p class="prompt memory-question">O que você viu?</p>
+          <div class="memory-options-row">
+            ${q.options.map(opt => {
+              const parts = opt.split(' ');
+              const icon = parts[0];
+              const text = parts.slice(1).join(' ');
+              return `
+                <button class="option option-card memory-card" onclick="checkMemoryAnswer('${opt}', '${q.answer}')">
+                  <div class="option-art option-art--emoji">
+                    <span class="illustration">${icon}</span>
+                  </div>
+                  <span class="option-caption">${text}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (containerEl) {
+      containerEl.innerHTML = html;
+    }
+
+    // Temporizador: Desfoca/esconde a sequência inicial e exibe a seleção de respostas
+    setTimeout(() => {
+      const displayEl = document.getElementById("memoryDisplay");
+      const selectionArea = document.getElementById("memorySelectionArea");
+      
+      if (displayEl) {
+        displayEl.classList.add("memory-hidden");
+      }
+      if (selectionArea) {
+        selectionArea.classList.remove("hidden-memory");
+        selectionArea.classList.add("visible-memory");
+      }
+    }, timeToWait);
+
+    return html;
   };
 })();
