@@ -157,6 +157,61 @@ h1, h2, p { margin-top: 0; }
 .hotspot-pedra { top: 61%; right: 15%; }
 .hotspot-tesouro { bottom: 8%; left: 37%; }
 .hotspot-casa { top: 54%; left: 14%; }
+.treasure-star,
+.treasure-stone {
+  position: absolute;
+  top: 61%;
+  left: 59%;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.treasure-star { pointer-events: none; }
+.treasure-star { z-index: 1; }
+.treasure-stone {
+  top: calc(61% - 9px);
+  left: calc(59% - 9px);
+  width: 72px;
+  height: 72px;
+  z-index: 2;
+  cursor: pointer;
+}
+.treasure-stone:hover, .treasure-stone:focus-visible {
+  background: transparent;
+  outline: 0;
+  transform: scale(1.08);
+}
+.treasure-stone--vanishing {
+  pointer-events: none;
+  animation: treasure-stone-disappear .65s ease-in forwards;
+}
+@keyframes treasure-stone-disappear {
+  0% { opacity: 1; transform: scale(1) rotate(0); }
+  100% { opacity: 0; transform: scale(.35) rotate(-16deg); }
+}
+.treasure-star .illustration,
+.treasure-star .illustration img,
+.treasure-stone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.play-area:has(.treasure-scene) {
+  overflow: hidden !important;
+}
+.play-area:has(.treasure-scene) .treasure-scene {
+  width: min(100%, 300px);
+  max-width: 300px;
+  max-height: 300px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
 .sum-equation { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; font-size: clamp(25px, 3vw, 46px); }
 .sum-equation > span { display: flex; flex-wrap: wrap; justify-content: center; max-width: min(100%, 460px); }
 .sum-equation b { color: var(--orange); }
@@ -287,13 +342,367 @@ h1, h2, p { margin-top: 0; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
-.next-shell { min-height: 100vh; min-height: 100svh; }
-.framework-status { position: fixed; z-index: 30; inset: 0; display: grid; align-content: center; justify-items: center; gap: 10px; padding: 24px; background: #8bc8ee; color: #15131f; text-align: center; }
-.framework-status h1, .framework-status p { margin: 0; }
-.framework-status h1 { font-size: clamp(22px, 4vw, 38px); }
-.framework-status p { font-weight: 800; }
-.framework-spinner { color: #ffbf29; font-size: 56px; animation: sparkle 1s ease-in-out infinite alternate; }
-@keyframes sparkle { to { transform: rotate(25deg) scale(1.18); } }
+/* Usa a marca ilustrada fornecida no projeto no lugar do título reconstruído em texto. */
+.brand-logo { display: block; width: clamp(220px, 27vw, 340px); height: auto; max-height: none; margin: 0 0 18px; object-fit: contain; font-size: 0; line-height: 1; letter-spacing: normal; -webkit-text-stroke: 0; text-shadow: none; transform: none; mix-blend-mode: multiply; }
+.brand-logo b, .brand-logo span { display: none; }
+.option-grid--images-only { width: min(100%, 820px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); align-items: center; justify-items: center; gap: clamp(14px, 3vw, 42px); }
+.option.option-illustration-only { width: min(100%, 220px); min-width: 0; min-height: 0; padding: 0; display: grid; place-items: center; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.option.option-illustration-only .option-art { width: 100%; height: auto; aspect-ratio: 1; display: grid; place-items: center; overflow: visible; }
+.option.option-illustration-only .illustration { width: 100%; height: 100%; font-size: clamp(80px, 10vw, 136px); }
+.option.option-illustration-only .illustration img { width: 100%; height: 100%; object-fit: contain; }
+.option.option-illustration-only:hover { transform: translateY(-3px) scale(1.04); background: transparent; filter: drop-shadow(0 4px 5px #15131f35); }
+.option.option-illustration-only.active { background: transparent; }
+.link-images { align-items: center; }
+.link-item.link-image { min-height: 68px; padding: 4px; display: grid; place-items: center; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.link-item.link-image .illustration img { width: clamp(56px, 7.5vw, 90px); height: clamp(56px, 7.5vw, 90px); object-fit: contain; }
+.link-item.link-image.active, .link-item.link-image.matched { border: 0; outline: 0; background: transparent; filter: drop-shadow(0 0 7px #58c783); }
+.count-item { border: 0; border-radius: 50%; background: transparent; }
+.count-item.selected { border: 0; border-radius: 50%; background: #c4f3d7; box-shadow: none; }
+.count-item.selected::after { content: none; }
+@media (max-width: 520px) {
+  .brand-logo { width: clamp(200px, 62vw, 280px); margin-bottom: 12px; }
+  .option-grid--images-only { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .option.option-illustration-only { width: min(100%, 150px); justify-self: center; }
+}
+
+/* Mantém o mesmo cartão e o conteúdo visível sem rolagem dentro dele. */
+.play-area { width: min(800px, calc(100vw - 48px)); height: auto; min-height: min(480px, calc(100svh - 150px)); max-height: none; aspect-ratio: auto; justify-content: flex-start; overflow: visible; }
+.play-area .activity-heading { flex: 0 0 auto; }
+.play-area .instruction-row { flex: 0 0 auto; }
+.play-area .activity-content { flex: 1 1 auto; min-height: 0; justify-content: center; gap: clamp(8px, 1.2vh, 14px); }
+.play-area--image-choice .identify-options.option-grid--images-only { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+.identify-options .option-art { overflow: hidden; }
+.identify-options .option-card .option-art .illustration img { width: 100%; height: 100%; object-fit: contain; }
+.identify-options .option-card .option-caption { flex: 0 0 auto; }
+.link-board { position: relative; z-index: 0; width: min(100%, 560px); grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 88px); }
+.link-lines { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.link-column { position: relative; z-index: 2; gap: 4px; }
+.link-column strong { min-height: 28px; display: grid; place-items: center; }
+.link-item { min-height: 78px; }
+.link-item.link-letter { border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: clamp(32px, 4vw, 54px); }
+.link-item.link-letter.active { color: var(--orange); outline: 0; text-decoration: underline; text-underline-offset: 6px; }
+.link-item.link-letter.matched { color: #23834d; background: transparent; box-shadow: none; }
+.link-item.link-image { width: 100%; min-height: 78px; }
+.link-item.link-image .illustration img { width: clamp(66px, 8vw, 96px); height: clamp(66px, 8vw, 96px); }
+.link-line { stroke: #ffbd16; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(1px 2px 0 #15131f); }
+.link-line-preview { stroke: #7b4bd1; stroke-dasharray: 7 6; }
+.link-item { touch-action: none; }
+.compare-card--static { cursor: default; }
+.compare-card--static:hover { transform: none; }
+.missing-word { gap: clamp(20px, 3vw, 38px); }
+.missing-slot { width: 2.1em; min-width: 2.1em; }
+@media (max-width: 800px) {
+  .play-area { width: min(800px, calc(100vw - 32px)); min-height: min(420px, calc(100svh - 150px)); padding: 20px 16px; }
+  .link-board { gap: clamp(18px, 5vw, 42px); }
+}
+@media (max-width: 520px) {
+  .play-area { width: calc(100vw - 24px); min-height: 0; padding: 16px 12px; gap: 10px; }
+  .play-area .activity-content { flex: 1 1 auto; justify-content: center; }
+  .link-board { gap: 10px; }
+  .link-item { min-height: 62px; }
+  .link-item.link-letter { font-size: 34px; }
+  .link-item.link-image { min-height: 62px; }
+  .link-item.link-image .illustration img { width: 58px; height: 58px; }
+  .missing-word { gap: 14px; font-size: clamp(38px, 9vw, 54px); }
+  .missing-slot { width: 2.1em; min-width: 2.1em; }
+  .compare-card { width: calc(50% - 4px); }
+}
+
+/* Ajuste final de viewport: o cartão inteiro cabe na tela, sem barra interna. */
+.screen.exercise { justify-content: center; overflow: hidden; }
+.play-area { width: min(900px, 70vw, calc(100vw - 40px)); height: auto; min-height: 0; max-height: none; margin-inline: auto; overflow: visible !important; flex: 0 0 auto; }
+.play-area .activity-content { overflow: visible; flex: 0 0 auto; }
+.play-area--image-choice .identify-target { min-height: 104px; font-size: clamp(64px, 7vw, 104px); }
+.play-area--image-choice .identify-target .illustration img { width: clamp(100px, 13vh, 150px); height: clamp(100px, 13vh, 150px); }
+.play-area--image-choice .identify-options.option-grid--images-only { width: min(100%, 700px); gap: clamp(8px, 2vw, 24px); }
+.play-area--image-choice .option.option-illustration-only { width: min(100%, 170px); }
+.play-area:not(.play-area--image-choice) .identify-target { min-height: 110px; }
+.play-area:not(.play-area--image-choice) .identify-target .illustration img { width: clamp(110px, 15vh, 170px); height: clamp(110px, 15vh, 170px); }
+.play-area:not(.play-area--image-choice) .identify-options .option-card { min-height: 130px; }
+.play-area:not(.play-area--image-choice) .identify-options .option-art { height: clamp(76px, 9vh, 108px); }
+@media (max-width: 800px) {
+  .play-area { width: min(800px, calc(100vw - 32px)); height: auto; }
+}
+@media (max-width: 520px) {
+  .screen.exercise { justify-content: center; overflow: hidden; }
+  .play-area { width: calc(100vw - 24px); height: auto; min-height: 0; }
+  .play-area--image-choice .identify-target { min-height: 78px; }
+  .play-area--image-choice .identify-target .illustration img { width: 96px; height: 96px; }
+  .play-area--image-choice .option.option-illustration-only { width: min(100%, 120px); }
+}
+
+/* Conteúdo interno fluido em qualquer tamanho de janela. */
+.play-area .activity-content,
+.play-area .activity-content > * { max-width: 100%; }
+@media (min-width: 1000px) and (max-width: 1600px) and (min-height: 700px) {
+  .play-area { width: min(939px, calc(100vw - 120px)); min-height: min(529px, calc(100vh - 150px)); aspect-ratio: 939 / 529; padding: 24px 28px 48px; }
+  .play-area:has(.identify-options) { padding-bottom: 84px; }
+  .play-area:has(.identify-options) .identify-options { margin-bottom: 44px; }
+}
+@media (min-width: 801px) and (max-height: 850px) {
+  .play-area { width: min(939px, calc(100vw - 80px)); aspect-ratio: 939 / 529; }
+  .play-area--letter-image { width: min(939px, calc(100vw - 80px)); }
+}
+
+/* Último ajuste: quatro alternativas de imagem na mesma linha. */
+.play-area--image-choice .identify-options.option-grid--images-only {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  column-gap: clamp(0px, 1vw, 10px) !important;
+  row-gap: 0 !important;
+}
+.play-area--image-choice .option.option-illustration-only {
+  width: min(100%, 150px) !important;
+  max-width: 150px !important;
+}
+@media (max-width: 520px) {
+  .play-area--image-choice .identify-options.option-grid--images-only {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 8px !important;
+  }
+  .play-area--image-choice .option.option-illustration-only {
+    width: 100% !important;
+    max-width: 128px !important;
+  }
+}
+
+/* As alternativas de imagens devem ocupar uma única linha dentro do cartão. */
+.play-area--image-choice .identify-options.option-grid--images-only {
+  width: min(100%, 900px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(8px, 2vw, 24px);
+  align-items: center;
+}
+.play-area--image-choice .option.option-illustration-only {
+  width: min(100%, 176px);
+  max-width: 176px;
+  justify-self: center;
+}
+.play-area--image-choice .option.option-illustration-only .option-art {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+@media (max-width: 800px) {
+  .play-area--image-choice .identify-options.option-grid--images-only {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .play-area--image-choice .option.option-illustration-only { max-width: 128px; }
+}
+@media (max-width: 520px) {
+  .play-area--image-choice .identify-options.option-grid--images-only {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 8px;
+  }
+}
+
+/* Mantém cada letra e sua imagem na mesma linha vertical. */
+.play-area:has(.link-board) .link-column { gap: 4px; }
+.play-area:has(.link-board) .link-item.link-letter,
+.play-area:has(.link-board) .link-item.link-image {
+  height: 76px;
+  min-height: 76px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.play-area:has(.link-board) .link-item.link-image .illustration img {
+  width: 72px;
+  height: 72px;
+}
+.play-area:has(.sum-equation) .activity-content {
+  flex: 1 1 auto;
+  justify-content: center;
+  padding-block: clamp(18px, 4vh, 36px);
+}
+.play-area:has(.compare) {
+  padding-bottom: clamp(42px, 6vh, 72px) !important;
+}
+.play-area:has(.compare) .activity-content {
+  padding-bottom: clamp(18px, 3vh, 34px);
+}
+.play-area--image-choice .identify-options.option-grid--images-only {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  column-gap: clamp(0px, 1vw, 10px) !important;
+  row-gap: 0 !important;
+}
+.play-area--image-choice .option.option-illustration-only {
+  width: min(100%, 150px);
+  max-width: 150px;
+}
+@media (max-width: 520px) {
+  .play-area:has(.link-board) .link-item.link-letter,
+  .play-area:has(.link-board) .link-item.link-image {
+    height: 62px;
+    min-height: 62px;
+  }
+  .play-area:has(.link-board) .link-item.link-image .illustration img {
+    width: 58px;
+    height: 58px;
+  }
+}
+.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 124px !important; height: 124px !important; padding: 8px !important; overflow: visible !important; }
+.play-area--sound-animal .identify-options .option-card .option-art .illustration,
+.play-area--sound-animal .identify-options .option-card .option-art .illustration img { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; object-fit: contain !important; overflow: visible; }
+.play-area:has(.missing-word) .missing-slot { width: 2.5em; min-width: 2.5em; height: 1.2em; }
+.play-area:has(.identify-options) { padding-bottom: clamp(28px, 3.5vh, 40px); }
+.play-area:has(.identify-options) .identify-options { margin-bottom: 8px; }
+.play-area:has(.count-items) .activity-content { justify-content: center; padding-block: clamp(18px, 4vh, 36px); gap: clamp(10px, 2vh, 18px); }
+.play-area:has(.count-items) .count-progress { display: none !important; }
+.play-area:has(.count-items) .count-item.selected::after { content: none !important; display: none !important; }
+.play-area:has(.add-equation) .activity-content,
+.play-area:has(.compare) .activity-content,
+.play-area:has(.pattern-sequence-display) .activity-content,
+.play-area:not(.play-area--letter-image):has(.identify-options) .activity-content { justify-content: center; padding-block: clamp(18px, 4vh, 36px); gap: clamp(10px, 2vh, 18px); }
+.play-area:has(.maze-board) .activity-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-items: center; column-gap: clamp(10px, 2vw, 26px); }
+.play-area:has(.maze-board) .maze-board { grid-column: 1; grid-row: 1; }
+.play-area:has(.maze-board) .maze-controls { grid-column: 2; grid-row: 1; }
+@media (max-width: 700px) {
+  .play-area:has(.maze-board) .activity-content { display: flex; flex-direction: column; }
+}
+.play-area--letter-image .identify-target { width: auto; min-height: 42px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: clamp(28px, 3vw, 36px); line-height: 1; }
+.play-area--letter-image .identify-options { width: min(100%, 520px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 3vw, 30px); }
+.play-area--letter-image .identify-options .option-card { min-height: 96px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.play-area--letter-image .identify-options .option-card .option-art { flex-basis: 76px; height: 76px; overflow: visible; }
+.play-area--letter-image .identify-options .option-card .option-caption { display: none; }
+.play-area--letter-image .option.option-illustration-only { width: 200px; min-height: 0; }
+.play-area--letter-image .option.option-illustration-only .option-art { width: 200px; height: 200px; aspect-ratio: 1; }
+.play-area--letter-image .option.option-illustration-only .option-art .illustration img { width: 200px; height: 200px; object-fit: contain; }
+.play-area--letter-image .option.option-illustration-only,
+.play-area--letter-image .option.option-illustration-only .option-art,
+.play-area--letter-image .option.option-illustration-only .illustration { background: transparent !important; }
+.play-area--letter-image .option.option-illustration-only .option-art .illustration img { mix-blend-mode: multiply; }
+.play-area--letter-image { width: min(939px, 70vw, calc(100vw - 40px)); padding-bottom: 48px; }
+.play-area--letter-image .identify-options { margin-bottom: 28px; }
+.play-area--sound-animal .identify-target { min-height: 78px; font-size: clamp(48px, 6vw, 72px); line-height: .95; }
+.play-area--sound-animal .identify-options .option-card { min-height: 190px; padding: 8px; }
+.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 136px; height: 136px; }
+.play-area--sound-animal .identify-options .option-card .option-art .illustration img { object-fit: contain; }
+.play-area--sound-animal .identify-options .option-card { width: 169.5px; min-height: 169.5px; aspect-ratio: 1; }
+.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 118px; height: 118px; padding: 8px; overflow: visible; box-sizing: border-box; }
+.play-area--sound-animal .identify-options .option-card .option-art .illustration,
+.play-area--sound-animal .identify-options .option-card .option-art .illustration img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.play-area--sound-animal .identify-options .option-card .option-caption { font-size: 17px; }
+.play-area:has(.compare) .compare-card { width: 169.5px; min-height: 169.5px; aspect-ratio: 1; }
+.play-area:has(.compare) .compare-card .visual { min-height: 66px; font-size: 48px; }
+.play-area:has(.compare) .compare-card .fruit-row { font-size: 30px; gap: 3px; }
+.play-area:has(.compare) .compare-card strong { font-size: 18px; }
+.play-area--star-match .identify-target { min-height: 150px; }
+.play-area--star-match .identify-target .illustration img { width: 220px; height: 220px; }
+.play-area--star-match .identify-options { width: min(100%, 680px); grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 2vw, 24px); }
+.play-area--star-match .identify-options .option-card { min-height: 120px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.play-area--star-match .identify-options .option-card .option-art { flex-basis: 120px; height: 120px; overflow: visible; }
+.play-area--star-match .identify-options .option-card .option-caption { display: none !important; }
+.play-area--star-match .identify-options .option-card .option-art { flex-basis: 160px !important; width: 160px; height: 160px !important; overflow: visible !important; padding: 8px; box-sizing: border-box; }
+.play-area--star-match .identify-options .option-card .option-art .illustration,
+.play-area--star-match .identify-options .option-card .option-art .illustration img { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; object-fit: contain !important; }
+@media (max-width: 520px) {
+  .play-area--letter-image { width: calc(100vw - 24px); padding-bottom: 48px; }
+  .play-area--letter-image .identify-target { width: auto; min-height: 40px; font-size: 30px; }
+  .play-area--letter-image .identify-options .option-card .option-art { flex-basis: 64px; height: 64px; }
+  .play-area--letter-image .option.option-illustration-only { width: min(30vw, 160px); }
+  .play-area--letter-image .option.option-illustration-only .option-art,
+  .play-area--letter-image .option.option-illustration-only .option-art .illustration img { width: min(30vw, 160px); height: min(30vw, 160px); }
+  .play-area--sound-animal .identify-target { min-height: 62px; font-size: 44px; }
+  .play-area--sound-animal .identify-options .option-card { width: min(42vw, 169.5px); min-height: min(42vw, 169.5px); }
+  .play-area--sound-animal .identify-options .option-card .option-art { flex-basis: min(30vw, 108px); height: min(30vw, 108px); padding: 6px; }
+  .play-area--star-match .identify-target { min-height: 112px; }
+  .play-area--star-match .identify-target .illustration img { width: 160px; height: 160px; }
+  .play-area--star-match .identify-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .play-area--star-match .identify-options .option-card .option-art { flex-basis: 94px; height: 94px; }
+}
+.play-area .prompt { max-width: 92%; }
+.play-area .prompt--compare { margin: clamp(10px, 1.8vh, 18px) 0 clamp(2px, .6vh, 7px); }
+.play-area .visual { max-width: 100%; }
+.play-area .option-grid--visual,
+.play-area .identify-options,
+.play-area .pattern-options,
+.play-area .count-items,
+.play-area .compare,
+.play-area .maze-board,
+.play-area .link-board { width: min(100%, 720px); }
+.play-area .option-card { min-width: 0; }
+.play-area .identify-options .option-card { min-height: 174px; justify-content: space-between; padding: 10px 9px 8px; overflow: hidden; }
+.play-area .identify-options .option-card .option-art { flex: 0 0 clamp(108px, 11vw, 128px); width: 100%; display: grid; place-items: center; overflow: hidden; }
+.play-area .identify-options .option-card .option-art .illustration { width: 100%; height: 100%; display: grid; place-items: center; }
+.play-area .identify-options .option-card .option-art .illustration img { width: 100%; height: 100%; object-fit: contain; }
+.play-area .identify-options .option-card .option-caption { position: static; flex: 0 0 auto; min-height: 22px; display: flex; align-items: center; justify-content: center; text-align: center; }
+.play-area:not(.play-area--image-choice) .identify-options { margin-top: -8px; }
+.play-area .identify-options .option-card--text { justify-content: center !important; align-items: center; text-align: center; }
+.play-area .link-board { width: min(100%, 560px); }
+.play-area .link-item.link-letter,
+.play-area .link-item.link-image { min-height: 76px; }
+.play-area .link-item.link-image .illustration img { width: 72px; height: 72px; }
+.play-area .option-caption { overflow-wrap: anywhere; }
+.play-area .count-items { grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); }
+.play-area .compare-card { min-width: 0; }
+.play-area .fruit-row { max-width: 100%; }
+.play-area .add-equation,
+.play-area .sum-equation,
+.play-area .missing-word,
+.play-area .word-display { max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 800px) {
+  .play-area { padding-inline: clamp(14px, 3vw, 24px); }
+  .play-area .activity-heading { gap: 8px; }
+  .play-area .screen-title { font-size: clamp(17px, 2.8vw, 24px); }
+  .play-area .subtitle { font-size: clamp(13px, 2vw, 17px); }
+  .play-area .prompt { font-size: clamp(14px, 2.2vw, 18px); }
+  .play-area .option-grid--visual { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .play-area .option-card { min-height: clamp(112px, 18vw, 150px); padding: 7px; }
+  .play-area .option-art { height: clamp(68px, 12vw, 104px); }
+  .play-area .option-caption { font-size: clamp(13px, 2vw, 17px); }
+  .play-area .identify-options .option-card { min-height: 154px; padding: 7px; }
+  .play-area .identify-options .option-card .option-art { flex-basis: clamp(88px, 16vw, 108px); }
+  .play-area .identify-options.option-grid--images-only { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .play-area .count-items { gap: clamp(5px, 1.2vw, 9px); }
+  .play-area .compare { gap: clamp(8px, 3vw, 24px); }
+  .play-area .compare-card { width: min(44%, 220px); }
+  .play-area .fruit-row { font-size: clamp(18px, 3vw, 28px); }
+  .play-area .maze-board { gap: 4px; }
+  .play-area .maze-controls { transform: scale(.9); transform-origin: top center; margin-bottom: -8px; }
+}
+@media (max-width: 520px) {
+  .play-area { padding-inline: 12px; }
+  .play-area .instruction-row { min-height: 52px; }
+  .play-area .identify-options.option-grid--images-only { gap: 2px; }
+  .play-area .option-grid--visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .play-area .identify-options .option-card { min-height: 142px; }
+  .play-area .identify-options .option-card .option-art { flex-basis: 86px; }
+  .play-area .count-items { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .play-area .compare-card { width: calc(50% - 4px); }
+  .play-area .maze-board { width: 100%; gap: 3px; }
+  .play-area .maze-controls { transform: scale(.78); margin-bottom: -18px; }
+  .play-area .missing-word { gap: 10px; }
+  .play-area .missing-options .option { padding-inline: 9px; }
+  .play-area .add-equation { gap: 12px; font-size: clamp(28px, 8vw, 44px); }
+  .play-area .add-fish-group .illustration img { width: clamp(52px, 15vw, 76px); height: clamp(52px, 15vw, 76px); }
+  .play-area .prompt--compare { margin-block: 8px 2px; }
+  .play-area .link-item.link-letter,
+  .play-area .link-item.link-image { min-height: 62px; }
+  .play-area .link-item.link-image .illustration img { width: 58px; height: 58px; }
+}
+@media (max-height: 700px) and (min-width: 521px) {
+  .screen.exercise { padding-top: 78px; padding-bottom: 18px; }
+  .play-area { padding-block: 16px; gap: 8px; }
+  .play-area .activity-content { gap: 8px; }
+  .play-area .identify-target { min-height: 90px; }
+  .play-area .identify-target .illustration img { width: 120px; height: 120px; }
+  .play-area .option-card { min-height: 108px; }
+  .play-area .option-art { height: 70px; }
+  .play-area .visual { min-height: 52px; }
+}
+
+/* O labirinto precisa reservar espaço para o cabeçalho, a grade e as setas no mesmo cartão. */
+.play-area:has(.maze-board) { justify-content: flex-start; gap: clamp(8px, 1.2vh, 14px); }
+.play-area:has(.maze-board) .activity-content { flex: 0 0 auto; gap: clamp(8px, 1.2vh, 14px); }
+.play-area:has(.maze-board) .maze-board { width: min(100%, 560px); }
+.play-area:has(.maze-board) .maze-controls { transform: none; margin: 0; }
+@media (max-width: 520px) {
+  .play-area:has(.maze-board) { gap: 7px; }
+  .play-area:has(.maze-board) .activity-content { gap: 7px; }
+  .play-area:has(.maze-board) .maze-board { width: 100%; }
+  .play-area:has(.maze-board) .maze-controls { transform: scale(.82); margin: -8px 0 -12px; }
+}
 
 /* Labirinto do Figma: gramado livre e trilha marrom em uma grade 8 × 4. */
 .maze-board { width: min(100%, 520px); display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: clamp(4px, .65vw, 8px); padding: clamp(6px, .8vw, 10px); border: 1.5px solid var(--ink); border-radius: 10px; background: #f8f7f4; }
@@ -459,303 +868,16 @@ h1, h2, p { margin-top: 0; }
   .play-area--letter-image { width: min(939px, calc(100vw - 80px)); }
 }
 
-/* As alternativas de imagens devem ocupar uma única linha dentro do cartão. */
-.play-area--image-choice .identify-options.option-grid--images-only {
-  width: min(100%, 900px);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(8px, 2vw, 24px);
-  align-items: center;
-}
-.play-area--image-choice .option.option-illustration-only {
-  width: min(100%, 176px);
-  max-width: 176px;
-  justify-self: center;
-}
-.play-area--image-choice .option.option-illustration-only .option-art {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-}
-@media (max-width: 800px) {
-  .play-area--image-choice .identify-options.option-grid--images-only {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-  }
-  .play-area--image-choice .option.option-illustration-only { max-width: 128px; }
-}
-@media (max-width: 520px) {
-  .play-area--image-choice .identify-options.option-grid--images-only {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    row-gap: 8px;
-  }
-}
-.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 124px !important; height: 124px !important; padding: 8px !important; overflow: visible !important; }
-.play-area--sound-animal .identify-options .option-card .option-art .illustration,
-.play-area--sound-animal .identify-options .option-card .option-art .illustration img { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; object-fit: contain !important; overflow: visible; }
-.play-area:has(.missing-word) .missing-slot { width: 2.5em; min-width: 2.5em; height: 1.2em; }
+/* Aviso do nome obrigatório na tela inicial. */
+.name-error { margin: 8px 0 0; color: #b3261e; font-weight: 800; text-align: center; }
+.name-error[hidden] { display: none; }
+.name-input[aria-invalid="true"] { border-color: #b3261e; box-shadow: 0 0 0 3px rgba(179,38,30,.25); }
 
-/* Usa a marca ilustrada fornecida no projeto no lugar do título reconstruído em texto. */
-.brand-logo { display: block; width: clamp(220px, 27vw, 340px); height: auto; max-height: none; margin: 0 0 18px; object-fit: contain; font-size: 0; line-height: 1; letter-spacing: normal; -webkit-text-stroke: 0; text-shadow: none; transform: none; mix-blend-mode: multiply; }
-.brand-logo b, .brand-logo span { display: none; }
-.option-grid--images-only { width: min(100%, 820px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); align-items: center; justify-items: center; gap: clamp(14px, 3vw, 42px); }
-.option.option-illustration-only { width: min(100%, 220px); min-width: 0; min-height: 0; padding: 0; display: grid; place-items: center; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.option.option-illustration-only .option-art { width: 100%; height: auto; aspect-ratio: 1; display: grid; place-items: center; overflow: visible; }
-.option.option-illustration-only .illustration { width: 100%; height: 100%; font-size: clamp(80px, 10vw, 136px); }
-.option.option-illustration-only .illustration img { width: 100%; height: 100%; object-fit: contain; }
-.option.option-illustration-only:hover { transform: translateY(-3px) scale(1.04); background: transparent; filter: drop-shadow(0 4px 5px #15131f35); }
-.option.option-illustration-only.active { background: transparent; }
-.link-images { align-items: center; }
-.link-item.link-image { min-height: 68px; padding: 4px; display: grid; place-items: center; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.link-item.link-image .illustration img { width: clamp(56px, 7.5vw, 90px); height: clamp(56px, 7.5vw, 90px); object-fit: contain; }
-.link-item.link-image.active, .link-item.link-image.matched { border: 0; outline: 0; background: transparent; filter: drop-shadow(0 0 7px #58c783); }
-.count-item { border: 0; border-radius: 50%; background: transparent; }
-.count-item.selected { border: 0; border-radius: 50%; background: #c4f3d7; box-shadow: none; }
-.count-item.selected::after { content: none; }
-@media (max-width: 520px) {
-  .brand-logo { width: clamp(200px, 62vw, 280px); margin-bottom: 12px; }
-  .option-grid--images-only { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .option.option-illustration-only { width: min(100%, 150px); justify-self: center; }
-}
-
-/* Mantém o mesmo cartão e o conteúdo visível sem rolagem dentro dele. */
-.play-area { width: min(800px, calc(100vw - 48px)); height: auto; min-height: min(480px, calc(100svh - 150px)); max-height: none; aspect-ratio: auto; justify-content: flex-start; overflow: visible; }
-.play-area .activity-heading { flex: 0 0 auto; }
-.play-area .instruction-row { flex: 0 0 auto; }
-.play-area .activity-content { flex: 1 1 auto; min-height: 0; justify-content: center; gap: clamp(8px, 1.2vh, 14px); }
-.play-area--image-choice .identify-options.option-grid--images-only { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
-.identify-options .option-art { overflow: hidden; }
-.identify-options .option-card .option-art .illustration img { width: 100%; height: 100%; object-fit: contain; }
-.identify-options .option-card .option-caption { flex: 0 0 auto; }
-.link-board { position: relative; z-index: 0; width: min(100%, 560px); grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 88px); }
-.link-lines { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.link-column { position: relative; z-index: 2; gap: 4px; }
-.link-column strong { min-height: 28px; display: grid; place-items: center; }
-.link-item { min-height: 78px; }
-.link-item.link-letter { border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: clamp(32px, 4vw, 54px); }
-.link-item.link-letter.active { color: var(--orange); outline: 0; text-decoration: underline; text-underline-offset: 6px; }
-.link-item.link-letter.matched { color: #23834d; background: transparent; box-shadow: none; }
-.link-item.link-image { width: 100%; min-height: 78px; }
-.link-item.link-image .illustration img { width: clamp(66px, 8vw, 96px); height: clamp(66px, 8vw, 96px); }
-.link-line { stroke: #ffbd16; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(1px 2px 0 #15131f); }
-.link-line-preview { stroke: #7b4bd1; stroke-dasharray: 7 6; }
-.link-item { touch-action: none; }
-.compare-card--static { cursor: default; }
-.compare-card--static:hover { transform: none; }
-.missing-word { gap: clamp(20px, 3vw, 38px); }
-.missing-slot { width: 2.1em; min-width: 2.1em; }
-@media (max-width: 800px) {
-  .play-area { width: min(800px, calc(100vw - 32px)); min-height: min(420px, calc(100svh - 150px)); padding: 20px 16px; }
-  .link-board { gap: clamp(18px, 5vw, 42px); }
-}
-@media (max-width: 520px) {
-  .play-area { width: calc(100vw - 24px); min-height: 0; padding: 16px 12px; gap: 10px; }
-  .play-area .activity-content { flex: 1 1 auto; justify-content: center; }
-  .link-board { gap: 10px; }
-  .link-item { min-height: 62px; }
-  .link-item.link-letter { font-size: 34px; }
-  .link-item.link-image { min-height: 62px; }
-  .link-item.link-image .illustration img { width: 58px; height: 58px; }
-  .missing-word { gap: 14px; font-size: clamp(38px, 9vw, 54px); }
-  .missing-slot { width: 2.1em; min-width: 2.1em; }
-  .compare-card { width: calc(50% - 4px); }
-}
-
-/* Ajuste final de viewport: o cartão inteiro cabe na tela, sem barra interna. */
-.screen.exercise { justify-content: center; overflow: hidden; }
-.play-area { width: min(900px, 70vw, calc(100vw - 40px)); height: auto; min-height: 0; max-height: none; margin-inline: auto; overflow: visible !important; flex: 0 0 auto; }
-.play-area .activity-content { overflow: visible; flex: 0 0 auto; }
-.play-area--image-choice .identify-target { min-height: 104px; font-size: clamp(64px, 7vw, 104px); }
-.play-area--image-choice .identify-target .illustration img { width: clamp(100px, 13vh, 150px); height: clamp(100px, 13vh, 150px); }
-.play-area--image-choice .identify-options.option-grid--images-only { width: min(100%, 700px); gap: clamp(8px, 2vw, 24px); }
-.play-area--image-choice .option.option-illustration-only { width: min(100%, 170px); }
-.play-area:not(.play-area--image-choice) .identify-target { min-height: 110px; }
-.play-area:not(.play-area--image-choice) .identify-target .illustration img { width: clamp(110px, 15vh, 170px); height: clamp(110px, 15vh, 170px); }
-.play-area:not(.play-area--image-choice) .identify-options .option-card { min-height: 130px; }
-.play-area:not(.play-area--image-choice) .identify-options .option-art { height: clamp(76px, 9vh, 108px); }
-@media (max-width: 800px) {
-  .play-area { width: min(800px, calc(100vw - 32px)); height: auto; }
-}
-@media (max-width: 520px) {
-  .screen.exercise { justify-content: center; overflow: hidden; }
-  .play-area { width: calc(100vw - 24px); height: auto; min-height: 0; }
-  .play-area--image-choice .identify-target { min-height: 78px; }
-  .play-area--image-choice .identify-target .illustration img { width: 96px; height: 96px; }
-  .play-area--image-choice .option.option-illustration-only { width: min(100%, 120px); }
-}
-
-/* Conteúdo interno fluido em qualquer tamanho de janela. */
-.play-area .activity-content,
-.play-area .activity-content > * { max-width: 100%; }
-@media (min-width: 1000px) and (max-width: 1600px) and (min-height: 700px) {
-  .play-area { width: min(939px, calc(100vw - 120px)); min-height: min(529px, calc(100vh - 150px)); aspect-ratio: 939 / 529; padding: 24px 28px 48px; }
-  .play-area:has(.identify-options) { padding-bottom: 84px; }
-  .play-area:has(.identify-options) .identify-options { margin-bottom: 44px; }
-}
-@media (min-width: 801px) and (max-height: 850px) {
-  .play-area { width: min(939px, calc(100vw - 80px)); aspect-ratio: 939 / 529; }
-  .play-area--letter-image { width: min(939px, calc(100vw - 80px)); }
-}
-.play-area:has(.identify-options) { padding-bottom: clamp(28px, 3.5vh, 40px); }
-.play-area:has(.identify-options) .identify-options { margin-bottom: 8px; }
-.play-area:has(.count-items) .activity-content { justify-content: center; padding-block: clamp(18px, 4vh, 36px); gap: clamp(10px, 2vh, 18px); }
-.play-area:has(.count-items) .count-progress { display: none !important; }
-.play-area:has(.count-items) .count-item.selected::after { content: none !important; display: none !important; }
-.play-area:has(.add-equation) .activity-content,
-.play-area:has(.compare) .activity-content,
-.play-area:has(.pattern-sequence-display) .activity-content,
-.play-area:not(.play-area--letter-image):has(.identify-options) .activity-content { justify-content: center; padding-block: clamp(18px, 4vh, 36px); gap: clamp(10px, 2vh, 18px); }
-.play-area:has(.maze-board) .activity-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-items: center; column-gap: clamp(10px, 2vw, 26px); }
-.play-area:has(.maze-board) .maze-board { grid-column: 1; grid-row: 1; }
-.play-area:has(.maze-board) .maze-controls { grid-column: 2; grid-row: 1; }
-@media (max-width: 700px) {
-  .play-area:has(.maze-board) .activity-content { display: flex; flex-direction: column; }
-}
-.play-area--letter-image .identify-target { width: auto; min-height: 42px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: clamp(28px, 3vw, 36px); line-height: 1; }
-.play-area--letter-image .identify-options { width: min(100%, 520px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 3vw, 30px); }
-.play-area--letter-image .identify-options .option-card { min-height: 96px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.play-area--letter-image .identify-options .option-card .option-art { flex-basis: 76px; height: 76px; overflow: visible; }
-.play-area--letter-image .identify-options .option-card .option-caption { display: none; }
-.play-area--letter-image .option.option-illustration-only { width: 200px; min-height: 0; }
-.play-area--letter-image .option.option-illustration-only .option-art { width: 200px; height: 200px; aspect-ratio: 1; }
-.play-area--letter-image .option.option-illustration-only .option-art .illustration img { width: 200px; height: 200px; object-fit: contain; }
-.play-area--letter-image .option.option-illustration-only,
-.play-area--letter-image .option.option-illustration-only .option-art,
-.play-area--letter-image .option.option-illustration-only .illustration { background: transparent !important; }
-.play-area--letter-image .option.option-illustration-only .option-art .illustration img { mix-blend-mode: multiply; }
-.play-area--letter-image { width: min(939px, 70vw, calc(100vw - 40px)); padding-bottom: 48px; }
-.play-area--letter-image .identify-options { margin-bottom: 28px; }
-.play-area--sound-animal .identify-target { min-height: 78px; font-size: clamp(48px, 6vw, 72px); line-height: .95; }
-.play-area--sound-animal .identify-options .option-card { min-height: 190px; padding: 8px; }
-.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 136px; height: 136px; }
-.play-area--sound-animal .identify-options .option-card .option-art .illustration img { object-fit: contain; }
-.play-area--sound-animal .identify-options .option-card { width: 169.5px; min-height: 169.5px; aspect-ratio: 1; }
-.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 118px; height: 118px; padding: 8px; overflow: visible; box-sizing: border-box; }
-.play-area--sound-animal .identify-options .option-card .option-art .illustration,
-.play-area--sound-animal .identify-options .option-card .option-art .illustration img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.play-area--sound-animal .identify-options .option-card .option-caption { font-size: 17px; }
-.play-area:has(.compare) .compare-card { width: 169.5px; min-height: 169.5px; aspect-ratio: 1; }
-.play-area:has(.compare) .compare-card .visual { min-height: 66px; font-size: 48px; }
-.play-area:has(.compare) .compare-card .fruit-row { font-size: 30px; gap: 3px; }
-.play-area:has(.compare) .compare-card strong { font-size: 18px; }
-.play-area--star-match .identify-target { min-height: 150px; }
-.play-area--star-match .identify-target .illustration img { width: 220px; height: 220px; }
-.play-area--star-match .identify-options { width: min(100%, 680px); grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 2vw, 24px); }
-.play-area--star-match .identify-options .option-card { min-height: 120px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.play-area--star-match .identify-options .option-card .option-art { flex-basis: 120px; height: 120px; overflow: visible; }
-.play-area--star-match .identify-options .option-card .option-caption { display: none !important; }
-.play-area--star-match .identify-options .option-card .option-art { flex-basis: 160px !important; width: 160px; height: 160px !important; overflow: visible !important; padding: 8px; box-sizing: border-box; }
-.play-area--star-match .identify-options .option-card .option-art .illustration,
-.play-area--star-match .identify-options .option-card .option-art .illustration img { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; object-fit: contain !important; }
-@media (max-width: 520px) {
-  .play-area--letter-image { width: calc(100vw - 24px); padding-bottom: 48px; }
-  .play-area--letter-image .identify-target { width: auto; min-height: 40px; font-size: 30px; }
-  .play-area--letter-image .identify-options .option-card .option-art { flex-basis: 64px; height: 64px; }
-  .play-area--letter-image .option.option-illustration-only { width: min(30vw, 160px); }
-  .play-area--letter-image .option.option-illustration-only .option-art,
-  .play-area--letter-image .option.option-illustration-only .option-art .illustration img { width: min(30vw, 160px); height: min(30vw, 160px); }
-  .play-area--sound-animal .identify-target { min-height: 62px; font-size: 44px; }
-  .play-area--sound-animal .identify-options .option-card { width: min(42vw, 169.5px); min-height: min(42vw, 169.5px); }
-  .play-area--sound-animal .identify-options .option-card .option-art { flex-basis: min(30vw, 108px); height: min(30vw, 108px); padding: 6px; }
-  .play-area--star-match .identify-target { min-height: 112px; }
-  .play-area--star-match .identify-target .illustration img { width: 160px; height: 160px; }
-  .play-area--star-match .identify-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .play-area--star-match .identify-options .option-card .option-art { flex-basis: 94px; height: 94px; }
-}
-.play-area .prompt { max-width: 92%; }
-.play-area .prompt--compare { margin: clamp(10px, 1.8vh, 18px) 0 clamp(2px, .6vh, 7px); }
-.play-area .visual { max-width: 100%; }
-.play-area .option-grid--visual,
-.play-area .identify-options,
-.play-area .pattern-options,
-.play-area .count-items,
-.play-area .compare,
-.play-area .maze-board,
-.play-area .link-board { width: min(100%, 720px); }
-.play-area .option-card { min-width: 0; }
-.play-area .identify-options .option-card { min-height: 174px; justify-content: space-between; padding: 10px 9px 8px; overflow: hidden; }
-.play-area .identify-options .option-card .option-art { flex: 0 0 clamp(108px, 11vw, 128px); width: 100%; display: grid; place-items: center; overflow: hidden; }
-.play-area .identify-options .option-card .option-art .illustration { width: 100%; height: 100%; display: grid; place-items: center; }
-.play-area .identify-options .option-card .option-art .illustration img { width: 100%; height: 100%; object-fit: contain; }
-.play-area .identify-options .option-card .option-caption { position: static; flex: 0 0 auto; min-height: 22px; display: flex; align-items: center; justify-content: center; text-align: center; }
-.play-area:not(.play-area--image-choice) .identify-options { margin-top: -8px; }
-.play-area .identify-options .option-card--text { justify-content: center !important; align-items: center; text-align: center; }
-.play-area .link-board { width: min(100%, 560px); }
-.play-area .link-item.link-letter,
-.play-area .link-item.link-image { min-height: 76px; }
-.play-area .link-item.link-image .illustration img { width: 72px; height: 72px; }
-.play-area .option-caption { overflow-wrap: anywhere; }
-.play-area .count-items { grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); }
-.play-area .compare-card { min-width: 0; }
-.play-area .fruit-row { max-width: 100%; }
-.play-area .add-equation,
-.play-area .sum-equation,
-.play-area .missing-word,
-.play-area .word-display { max-width: 100%; overflow-wrap: anywhere; }
-@media (max-width: 800px) {
-  .play-area { padding-inline: clamp(14px, 3vw, 24px); }
-  .play-area .activity-heading { gap: 8px; }
-  .play-area .screen-title { font-size: clamp(17px, 2.8vw, 24px); }
-  .play-area .subtitle { font-size: clamp(13px, 2vw, 17px); }
-  .play-area .prompt { font-size: clamp(14px, 2.2vw, 18px); }
-  .play-area .option-grid--visual { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-  .play-area .option-card { min-height: clamp(112px, 18vw, 150px); padding: 7px; }
-  .play-area .option-art { height: clamp(68px, 12vw, 104px); }
-  .play-area .option-caption { font-size: clamp(13px, 2vw, 17px); }
-  .play-area .identify-options .option-card { min-height: 154px; padding: 7px; }
-  .play-area .identify-options .option-card .option-art { flex-basis: clamp(88px, 16vw, 108px); }
-  .play-area .identify-options.option-grid--images-only { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .play-area .count-items { gap: clamp(5px, 1.2vw, 9px); }
-  .play-area .compare { gap: clamp(8px, 3vw, 24px); }
-  .play-area .compare-card { width: min(44%, 220px); }
-  .play-area .fruit-row { font-size: clamp(18px, 3vw, 28px); }
-  .play-area .maze-board { gap: 4px; }
-  .play-area .maze-controls { transform: scale(.9); transform-origin: top center; margin-bottom: -8px; }
-}
-@media (max-width: 520px) {
-  .play-area { padding-inline: 12px; }
-  .play-area .instruction-row { min-height: 52px; }
-  .play-area .identify-options.option-grid--images-only { gap: 2px; }
-  .play-area .option-grid--visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .play-area .identify-options .option-card { min-height: 142px; }
-  .play-area .identify-options .option-card .option-art { flex-basis: 86px; }
-  .play-area .count-items { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .play-area .compare-card { width: calc(50% - 4px); }
-  .play-area .maze-board { width: 100%; gap: 3px; }
-  .play-area .maze-controls { transform: scale(.78); margin-bottom: -18px; }
-  .play-area .missing-word { gap: 10px; }
-  .play-area .missing-options .option { padding-inline: 9px; }
-  .play-area .add-equation { gap: 12px; font-size: clamp(28px, 8vw, 44px); }
-  .play-area .add-fish-group .illustration img { width: clamp(52px, 15vw, 76px); height: clamp(52px, 15vw, 76px); }
-  .play-area .prompt--compare { margin-block: 8px 2px; }
-  .play-area .link-item.link-letter,
-  .play-area .link-item.link-image { min-height: 62px; }
-  .play-area .link-item.link-image .illustration img { width: 58px; height: 58px; }
-}
-@media (max-height: 700px) and (min-width: 521px) {
-  .screen.exercise { padding-top: 78px; padding-bottom: 18px; }
-  .play-area { padding-block: 16px; gap: 8px; }
-  .play-area .activity-content { gap: 8px; }
-  .play-area .identify-target { min-height: 90px; }
-  .play-area .identify-target .illustration img { width: 120px; height: 120px; }
-  .play-area .option-card { min-height: 108px; }
-  .play-area .option-art { height: 70px; }
-  .play-area .visual { min-height: 52px; }
-}
-
-/* O labirinto precisa reservar espaço para o cabeçalho, a grade e as setas no mesmo cartão. */
-.play-area:has(.maze-board) { justify-content: flex-start; gap: clamp(8px, 1.2vh, 14px); }
-.play-area:has(.maze-board) .activity-content { flex: 0 0 auto; gap: clamp(8px, 1.2vh, 14px); }
-.play-area:has(.maze-board) .maze-board { width: min(100%, 560px); }
-.play-area:has(.maze-board) .maze-controls { transform: none; margin: 0; }
-@media (max-width: 520px) {
-  .play-area:has(.maze-board) { gap: 7px; }
-  .play-area:has(.maze-board) .activity-content { gap: 7px; }
-  .play-area:has(.maze-board) .maze-board { width: 100%; }
-  .play-area:has(.maze-board) .maze-controls { transform: scale(.82); margin: -8px 0 -12px; }
-}
-
-.play-area:has(.sum-equation) .activity-content {
-  flex: 1 1 auto;
-  justify-content: center;
-  padding-block: clamp(18px, 4vh, 36px);
-}
+/* ===== Específico do Next.js (gerado por scripts/sync-next.mjs; edite styles.css, não este arquivo) ===== */
+.next-shell { min-height: 100vh; min-height: 100svh; }
+.framework-status { position: fixed; z-index: 30; inset: 0; display: grid; align-content: center; justify-items: center; gap: 10px; padding: 24px; background: #8bc8ee; color: #15131f; text-align: center; }
+.framework-status h1, .framework-status p { margin: 0; }
+.framework-status h1 { font-size: clamp(22px, 4vw, 38px); }
+.framework-status p { font-weight: 800; }
+.framework-spinner { color: #ffbf29; font-size: 56px; animation: sparkle 1s ease-in-out infinite alternate; }
+@keyframes sparkle { to { transform: rotate(25deg) scale(1.18); } }

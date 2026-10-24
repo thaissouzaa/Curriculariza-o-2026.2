@@ -34,9 +34,9 @@ export default function HomePage() {
 
     (async () => {
       try {
-        await loadScript("/questions.js?v=20261022-pattern-figures");
+        await loadScript("/questions.js?v=20261023-music");
         if (disposed) return;
-        await loadScript("/game.js?v=20261022-pattern-figures");
+        await loadScript("/game.js?v=20261023-music");
         if (!disposed) setStatus("ready");
       } catch (error) {
         console.error(error);
