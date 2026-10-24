@@ -9,7 +9,7 @@
   window.questionBank = {
     "Fácil": [
       q("Monte a palavra", "Toque nas sílabas na ordem certa.", "syllables", "Ouça e forme a palavra GATO.", { audio: "audio/facil-01-gato.mp3", icon: "🐱", parts: 2, options: ["TO", "GA"], answer: "GA-TO" }),
-      q("Ligue a letra à imagem", "Toque na imagem que começa com a letra A.", "identify", "Qual imagem começa com a letra A?", { audio: "audio/facil-02-letra-a.mp3", target: "A", options: ["🐝 Abelha", "🐱 Gato", "🐶 Cachorro"], answer: "🐝 Abelha" }),
+      q("Ligue a letra à imagem", "Toque na imagem que começa com a letra A.", "identify", "Qual imagem começa com a letra A?", { audio: "audio/facil-02-letra-a.mp3", target: "A", imageOnly: true, options: ["🐝 Abelha", "🐱 Gato", "🐶 Cachorro"], answer: "🐝 Abelha" }),
       q("Alimente o personagem", "Toque nas maçãs até escolher a quantidade pedida.", "count", "Quero 3 maçãs!", { audio: "audio/facil-03-contar-macas.mp3", guide: "👦", icon: "🍎", pool: 5, target: 3, answer: "3" }),
       q("Complete a quantidade", "Adicione peixes até completar a quantidade.", "add", "Coloque peixes suficientes para termos 5.", { audio: "audio/facil-04-adicionar-peixes.mp3", icon: "🐟", initial: 2, target: 5, options: ["1", "2", "3", "4"], answer: "3" }),
       q("Quem tem mais?", "Conte as maçãs de cada personagem.", "compare", "Quem tem mais maçãs?", { audio: "audio/facil-05-comparar-macas.mp3", left: 2, right: 4, leftName: "🐰 Coelho", rightName: "🐻 Urso", answer: "right" }),
@@ -40,7 +40,7 @@
       q("Onde está o tesouro?", "Ouça a dica e toque no lugar onde está o tesouro.", "treasure", "O tesouro está ao lado da árvore e embaixo da pedra.", { audio: "audio/dificil-06-tesouro.mp3", cells: [{ pos: "casa", icon: "🏠" }, { pos: "arvore", icon: "🌳" }, { pos: "pedra", icon: "🪨" }, { pos: "tesouro", icon: "⭐" }], answer: "pedra" }),
       q("Continue a sequência", "Observe o padrão e escolha a próxima figura.", "pattern", "Qual figura vem depois?", { audio: "audio/dificil-07-padrao-cores.mp3", series: "🔴 🔵 🔵 🔴 🔵 🔵 ?", options: ["🔵", "🔴", "🟢", "🟡"], answer: "🔴" }),
       q("Observe e memorize", "Memorize as figuras. Elas vão sumir.", "memory", "Qual figura apareceu antes?", { audio: "audio/dificil-08-memoria-observar.mp3", responseAudio: "audio/dificil-08-memoria-responder.mp3", memory: "🍎　🐶　⭐　🚗", options: ["🐱", "🏠", "🍎", "⚽"], answer: "🍎" }),
-      q("Ajude o personagem a chegar", "Siga os quadrados marrons até a casa e evite o gramado.", "maze", "Leve o personagem até a casa usando as setas.", { audio: "audio/medio-08-caminho-casa.mp3", rows: 4, columns: 8, start: [0, 0], goal: [1, 7], route: ["➡️", "➡️", "➡️", "⬇️", "⬇️", "⬇️", "➡️", "➡️", "➡️", "➡️", "⬆️", "⬆️"], answer: "chegou" }),
+      q("Ajude o personagem a chegar", "Escolha as setas na ordem certa.", "maze", "Leve o personagem até a casa seguindo o caminho marrom.", { audio: "audio/medio-08-caminho-casa.mp3", rows: 4, columns: 8, start: [3, 0], goal: [0, 7], route: ["➡️", "⬆️", "➡️", "⬆️", "➡️", "➡️", "⬇️", "➡️", "➡️", "⬆️", "➡️", "⬆️"], answer: "chegou" }),
       q("Letras e escrita", "Ouça a pergunta e escolha a forma correta de escrever o nome.", "choice", "João precisa escrever seu próprio nome. Qual forma está correta?", { audio: "audio/dificil-10-escrever-nome.mp3", options: ["joão", "joAO", "JOÃO", "João"], answer: "João" })
     ]
   };
