@@ -4,7 +4,10 @@
   "private": true,
   "description": "Jogo educativo infantil com Next.js e React, preparado para exportação estática.",
   "scripts": {
+    "sync": "node scripts/sync-next.mjs",
+    "predev": "npm run sync",
     "dev": "next dev --hostname 0.0.0.0",
+    "prebuild": "npm run sync",
     "build": "next build"
   },
   "repository": {

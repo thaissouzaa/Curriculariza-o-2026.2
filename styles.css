@@ -867,3 +867,8 @@ h1, h2, p { margin-top: 0; }
   .play-area { width: min(939px, calc(100vw - 80px)); aspect-ratio: 939 / 529; }
   .play-area--letter-image { width: min(939px, calc(100vw - 80px)); }
 }
+
+/* Aviso do nome obrigatório na tela inicial. */
+.name-error { margin: 8px 0 0; color: #b3261e; font-weight: 800; text-align: center; }
+.name-error[hidden] { display: none; }
+.name-input[aria-invalid="true"] { border-color: #b3261e; box-shadow: 0 0 0 3px rgba(179,38,30,.25); }

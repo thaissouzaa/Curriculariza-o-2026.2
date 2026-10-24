@@ -31,3 +31,7 @@ O banco acompanha as 30 atividades do PDF, na mesma ordem: dez fáceis, dez méd
 ## Voz e acessibilidade
 
 A voz dos enunciados, retornos, sílabas e palavras completas foi gerada no ElevenLabs com Raquel — Expressive and Energetic (pt-BR) e está incluída como arquivos locais. A partida não consulta ElevenLabs nem precisa de rede para reproduzir esses clipes. Não há chave de API nem fala sintetizada pelo navegador no projeto. O botão de som silencia fala e efeitos. Tab, Enter e Espaço podem ser usados para navegar.
+
+## Música e efeitos
+
+A música de fundo e os sons de passar o mouse e tocar na tela são gerados pelo navegador (Web Audio), sem arquivos extras. A música começa no primeiro toque, abaixa sozinha enquanto uma fala toca e é desligada pelo botão de som, junto com os efeitos. Para mudar o volume, ajuste `musicBase` no início de `app.js`.
